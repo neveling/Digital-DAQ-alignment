@@ -89,8 +89,8 @@ void FileComparePA()
         hEventVsRatio->Fill(MidasEvtNum,tacratio); 
     }
     
-    //for(int i=10; i<totalentriesmidas/2; i++){
-    for(int i=0; i<3300; i++)
+    for(int i=10; i<totalentriesmidas/2; i++)
+//     for(int i=0; i<3300; i++)
     {
         
         digtree->GetEntry(i+DigitalEventSkip);
@@ -230,8 +230,10 @@ int FindNextDigitalEvent(int MidasEventNumber, int DigitalEventSkip, TTree* Mida
     cout << "Starting with skipping " << result << " events" << endl;    
     
     bool MatchEvents = false;
+    bool PositiveMove = true;
+    int StepSize = 1;
     
-    while(result-DigitalEventSkip<100 && !MatchEvents)
+    while(abs(result-DigitalEventSkip)<100 && !MatchEvents)
     {
         cout << "DigitalEventSkip = " << result << endl;
         cout << "This is " << result-DigitalEventSkip << " more skips since the last matching event" << endl;
@@ -243,8 +245,21 @@ int FindNextDigitalEvent(int MidasEventNumber, int DigitalEventSkip, TTree* Mida
         cout << "tacratio: " << tacratio << endl;
         
         if(!((tacratio>lowratio1 && tacratio<hiratio1) || tacratio>lowratio2))
+        {
             MatchEvents = true;
-        else result++;
+            cout << "Found GOOD matching event" << endl;
+        }
+        else if(PositiveMove)
+        {
+            result = result+StepSize;
+            PositiveMove = false;
+        }
+        else if(!PositiveMove)
+        {
+            result = result - StepSize;
+            PositiveMove = true;
+        }
+        StepSize++;
     }
     
     cout << endl;
