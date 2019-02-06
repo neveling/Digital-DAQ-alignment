@@ -48,6 +48,9 @@ void FileComparePA()
     TGraph *gTACValues = new TGraph();
     gTACValues->SetName("gTACValues");
     
+    TGraph *gSkipValues = new TGraph();
+    gSkipValues->SetName("gSkipValues");
+    
     midastree->SetBranchAddress("TAC",&MidasTac);
     midastree->SetBranchAddress("evtcounter",&MidasEvtNum);
     midastree->SetBranchAddress("X1pos",&X1pos);
@@ -78,6 +81,7 @@ void FileComparePA()
     int printlownum=2250;
     int printhinum=3300;
     int TACGraphcounter = 0;
+    int SkipValuesCounter = 0;
     int DigitalEventSkip = 0;
     
     for(int i=10; i<totalentriesmidas/2; i++)
@@ -118,6 +122,9 @@ void FileComparePA()
             digtree->GetEntry(i+DigitalEventSkip);
             tacratio = 0.08*DigTacEnergy/(MidasTac-200);
         }
+        
+        gSkipValues->SetPoint(SkipValuesCounter,i,DigitalEventSkip);
+        SkipValuesCounter++;
         
         /*
          *        if( (tacratio>lowratio1 && tacratio<hiratio1) || (tacratio>lowratio2 && tacratio<hiratio2) )
@@ -219,6 +226,8 @@ void FileComparePA()
     c1->Update();
     
     hEventVsRatioC->Draw("col");
+    
+    gSkipValues->Draw("A*");
 }
 
 int FindNextDigitalEvent(int MidasEventNumber, int DigitalEventSkip, TTree* MidasTree, TTree *DigitalTree)
